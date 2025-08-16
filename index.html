@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Age Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            min-height: 100vh;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        /* Animated blobs background */
+        .blobs-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.55;
+            filter: blur(12px);
+            animation: moveBlob 18s ease-in-out infinite alternate;
+        }
+        .blob1 {
+            width: 480px; height: 480px;
+            background: radial-gradient(circle at 30% 30%, #a1c4fd 60%, #c2e9fb 100%);
+            left: -120px; top: -80px;
+            animation-delay: 0s;
+        }
+        .blob2 {
+            width: 360px; height: 360px;
+            background: radial-gradient(circle at 70% 70%, #fcb69f 60%, #ffecd2 100%);
+            right: -100px; top: 40vh;
+            animation-delay: 3s;
+        }
+        .blob3 {
+            width: 260px; height: 260px;
+            background: radial-gradient(circle at 50% 50%, #f357a8 60%, #7b2ff2 100%);
+            left: 60vw; top: 70vh;
+            animation-delay: 6s;
+        }
+        @keyframes moveBlob {
+            0% { transform: scale(1) translateY(0) translateX(0); }
+            50% { transform: scale(1.15) translateY(-40px) translateX(40px); }
+            100% { transform: scale(1) translateY(0) translateX(0); }
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255,255,255,0.18);
+            box-shadow: 0 12px 48px 0 rgba(31,38,135,0.22), 0 1.5px 12px 0 rgba(255,255,255,0.18) inset;
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-radius: 2.2rem;
+            border: 2.5px solid rgba(255,255,255,0.32);
+            padding: 44px 48px 40px 48px;
+            max-width: 600px;
+            width: 98vw;
+            text-align: center;
+            animation: fadeIn 1.2s cubic-bezier(.39,.575,.56,1) both;
+            transition: box-shadow 0.3s, background 0.3s;
+        }
+        .container:hover {
+            box-shadow: 0 18px 64px 0 rgba(31,38,135,0.28), 0 2.5px 18px 0 rgba(255,255,255,0.22) inset;
+            background: rgba(255,255,255,0.28);
+        }
+        h1 {
+            color: #7b2ff2;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .fa-cake-candles {
+            color: #ffb347;
+            margin-right: 8px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 18px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .input-group i {
+            color: #7b2ff2;
+            font-size: 1.2rem;
+        }
+        input[type="date"], .flatpickr-input {
+            padding: 12px;
+            border: 1.5px solid #8ec5fc;
+            border-radius: 9px;
+            width: 100%;
+            font-size: 1.08rem;
+            box-sizing: border-box;
+            transition: border 0.2s;
+            background: rgba(255,255,255,0.7);
+            color: #333;
+        }
+        input[type="date"]:focus, .flatpickr-input:focus {
+            border-color: #7b2ff2;
+            outline: none;
+        }
+        button {
+            padding: 14px 32px;
+            margin-top: 10px;
+            background: linear-gradient(90deg,#7b2ff2 0%,#f357a8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 1.15rem;
+            font-weight: 600;
+            box-shadow: 0 2px 12px 0 #8ec5fc22;
+            transition: background 0.2s, transform 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(90deg,#f357a8 0%,#7b2ff2 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        #result {
+            margin-top: 22px;
+            font-size: 1.2em;
+            color: #7b2ff2;
+            font-weight: 600;
+            min-height: 32px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 18px 4vw 18px 4vw;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+    <script>
+        function calculateAge() {
+            const dob = document.getElementById("dob").value;
+            if (!dob) {
+                document.getElementById("result").innerHTML = '<span style="color:#f357a8;"><i class="fa-solid fa-triangle-exclamation"></i> Please enter your date of birth.</span>';
+                return;
+            }
+            const birthDate = new Date(dob);
+            const currentDate = new Date();
+            let ageYears = currentDate.getFullYear() - birthDate.getFullYear();
+            let ageMonths = currentDate.getMonth() - birthDate.getMonth();
+            let ageDays = currentDate.getDate() - birthDate.getDate();
+            if (ageDays < 0) {
+                ageMonths--;
+                ageDays += new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+            }
+            if (ageMonths < 0) {
+                ageYears--;
+                ageMonths += 12;
+            }
+            document.getElementById("result").innerHTML = `<i class='fa-solid fa-cake-candles'></i> You are <span style='color:#f357a8;'>${ageYears}</span> years, <span style='color:#f357a8;'>${ageMonths}</span> months, and <span style='color:#f357a8;'>${ageDays}</span> days old.`;
+        }
+        window.onload = function() {
+            flatpickr("#dob", {
+                dateFormat: "Y-m-d",
+                maxDate: new Date(),
+                defaultDate: null,
+                disableMobile: true,
+                altInput: true,
+                altFormat: "F j, Y",
+                allowInput: false
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="blobs-bg">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+    </div>
+    <div class="container">
+        <h1><i class="fa-solid fa-cake-candles"></i> Age Calculator</h1>
+        <p>Enter your date of birth to find out your exact age in years, months, and days!</p>
+        <div class="input-group">
+            <i class="fa-solid fa-calendar-days"></i>
+            <input type="text" id="dob" aria-label="Date of Birth" placeholder="Select your birth date" readonly>
+        </div>
+        <button onclick="calculateAge()"><i class="fa-solid fa-calculator"></i> Calculate Age</button>
+        <div id="result"></div>
+    </div>
+</body>
+</html>
